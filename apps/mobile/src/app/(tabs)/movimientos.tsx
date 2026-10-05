@@ -1,7 +1,7 @@
 import { useDatos, useResumen } from '@finanzas/api';
 import type { Movimiento } from '@finanzas/core';
 import { claveDia, esGasto, etiquetaDia, formatoMXN, normalizar, periodoDe } from '@finanzas/core';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { FlatList, RefreshControl, TextInput, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,7 +11,10 @@ import { Segmentado } from '../../componentes/graficas';
 import { IconoBuscar } from '../../componentes/iconos';
 import { DetalleMovimiento, FilaMovimiento, nombreMovimiento } from '../../componentes/movimientos';
 import { useContador } from '../../componentes/useContador';
-import { color, fuente } from '../../lib/tema';
+import { color, fuente, suave } from '../../lib/tema';
+
+// Al filtrar o buscar, las filas solo aparecen (sin cascada ni resorte).
+const APARECER = FadeIn.duration(suave.duration).easing(suave.easing);
 
 const FILTROS = ['Todos', 'Gastos', 'Ingresos', 'Internos'] as const;
 const TIPOS: Array<Movimiento['tipo'] | null> = [null, 'gasto', 'ingreso', 'interno'];
@@ -26,6 +29,7 @@ export default function Movimientos() {
   const [buscando, setBuscando] = useState(false);
   const [busqueda, setBusqueda] = useState('');
   const [detalle, setDetalle] = useState<Movimiento | null>(null);
+  const filtrada = useRef(false);
 
   const semana = useContador(r.series.dias.reduce((a, d) => a + d.monto, 0));
   const fusionadosMes = r.movsMes.filter((m) => m.avisos.length > 1).length;
@@ -73,11 +77,14 @@ export default function Movimientos() {
               }
             />
             {buscando && (
-              <Animated.View entering={FadeInUp.springify().damping(18)}>
+              <Animated.View entering={FadeInUp.duration(suave.duration).easing(suave.easing)}>
                 <TextInput
                   autoFocus
                   value={busqueda}
-                  onChangeText={setBusqueda}
+                  onChangeText={(t) => {
+                    filtrada.current = true;
+                    setBusqueda(t);
+                  }}
                   placeholder="Buscar comercio"
                   placeholderTextColor={color.tenue}
                   selectionColor={color.acento}
@@ -98,8 +105,15 @@ export default function Movimientos() {
                 <T v="pequeno">pagos con Wallet sin duplicar este mes</T>
               </View>
             </Tarjeta>
-            <Animated.View entering={FadeInDown.delay(120).springify()}>
-              <Segmentado opciones={[...FILTROS]} valor={filtro} onCambio={setFiltro} />
+            <Animated.View entering={FadeInDown.delay(120).springify().damping(18)}>
+              <Segmentado
+                opciones={[...FILTROS]}
+                valor={filtro}
+                onCambio={(i) => {
+                  filtrada.current = true;
+                  setFiltro(i);
+                }}
+              />
             </Animated.View>
           </View>
         }
@@ -112,12 +126,12 @@ export default function Movimientos() {
         }
         renderItem={({ item }) =>
           item.tipo === 'dia' ? (
-            <Animated.View entering={FadeInDown.delay(60).springify().damping(18)} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 14, paddingBottom: 4, paddingHorizontal: 10 }}>
+            <Animated.View entering={filtrada.current ? APARECER : FadeInDown.delay(60).springify().damping(18)} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 14, paddingBottom: 4, paddingHorizontal: 10 }}>
               <T v="semi" style={{ fontSize: 12.5, color: '#C9CBD1' }}>{item.etiqueta}</T>
               {item.total > 0 && <T v="mono" style={{ color: color.tenue, fontSize: 11.5 }}>−{formatoMXN(item.total)}</T>}
             </Animated.View>
           ) : (
-            <Animated.View entering={FadeInDown.delay(Math.min(item.indice, 10) * 40 + 100).springify().damping(18)}>
+            <Animated.View entering={filtrada.current ? APARECER : FadeInDown.delay(Math.min(item.indice, 10) * 40 + 100).springify().damping(18)}>
               <FilaMovimiento m={item.m} onPress={() => setDetalle(item.m)} />
             </Animated.View>
           )

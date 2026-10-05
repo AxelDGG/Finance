@@ -3,14 +3,14 @@ import { formatoMXN, porcentajeDe, porcentajeGastos } from '@finanzas/core';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, View, type LayoutChangeEvent } from 'react-native';
-import Animated, { FadeIn, FadeInDown, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Boton, Chip, Presionable, T, Tarjeta, TextoMetal } from '../../componentes/base';
 import { BotonIcono, Encabezado } from '../../componentes/Encabezado';
 import { Anillo, BarraProgreso, GraficaProyeccion, Segmentado } from '../../componentes/graficas';
 import { IconoAjustes, IconoChevron } from '../../componentes/iconos';
 import { useContador } from '../../componentes/useContador';
-import { color } from '../../lib/tema';
+import { color, deslizar, suave } from '../../lib/tema';
 
 export default function Apartados() {
   const insets = useSafeAreaInsets();
@@ -84,11 +84,11 @@ export default function Apartados() {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <View style={{ gap: 8 }}>
                     <T v="eyebrow">Proyección</T>
-                    <Animated.View key={`m-${sel}-${meta.apartado.id}`} entering={FadeInDown.springify().damping(16)}>
+                    <Animated.View key={`m-${sel}-${meta.apartado.id}`} entering={FadeInDown.duration(suave.duration).easing(suave.easing)}>
                       <T v="display" style={{ fontSize: 28 }}>{formatoMXN(puntoSel?.acumulado ?? 0, { decimales: 'nunca' })}</T>
                     </Animated.View>
                   </View>
-                  <Animated.View key={`e-${sel}-${meta.apartado.id}`} entering={FadeInDown.springify().damping(16)} style={{ alignItems: 'flex-end', gap: 8 }}>
+                  <Animated.View key={`e-${sel}-${meta.apartado.id}`} entering={FadeInDown.duration(suave.duration).easing(suave.easing)} style={{ alignItems: 'flex-end', gap: 8 }}>
                     <T v="tenue" style={{ fontSize: 12.5 }}>{puntoSel?.etiqueta}</T>
                     <Chip texto={puntoSel?.real ? 'Real' : 'Proyectado'} acento={!puntoSel?.real} />
                   </Animated.View>
@@ -155,7 +155,7 @@ export default function Apartados() {
                   <Giro abierta={abierta} />
                 </Presionable>
                 {abierta && (
-                  <Animated.View entering={FadeInDown.springify().damping(18)} style={{ paddingHorizontal: 14, paddingBottom: 16, gap: 12 }}>
+                  <Animated.View entering={FadeInDown.duration(suave.duration).easing(suave.easing)} style={{ paddingHorizontal: 14, paddingBottom: 16, gap: 12 }}>
                     <View style={{ flexDirection: 'row', height: 12, borderRadius: 99, overflow: 'hidden', backgroundColor: color.pista }}>
                       {partes.map((p, i) => (
                         <Segmento key={p.id} ancho={p.pct} colorSeg={p.color} retraso={i * 120} />
@@ -199,7 +199,7 @@ function Segmento({ ancho, colorSeg, retraso }: { ancho: number; colorSeg: strin
   const w = useSharedValue(0);
   useEffect(() => {
     const t = setTimeout(() => {
-      w.value = withSpring(ancho, { damping: 18, stiffness: 120 });
+      w.value = withTiming(ancho, deslizar);
     }, retraso);
     return () => clearTimeout(t);
   }, [ancho, retraso, w]);
@@ -210,7 +210,7 @@ function Segmento({ ancho, colorSeg, retraso }: { ancho: number; colorSeg: strin
 function Giro({ abierta }: { abierta: boolean }) {
   const g = useSharedValue(0);
   useEffect(() => {
-    g.value = withSpring(abierta ? 180 : 0, { damping: 14, stiffness: 160 });
+    g.value = withTiming(abierta ? 180 : 0, suave);
   }, [abierta, g]);
   const estilo = useAnimatedStyle(() => ({ transform: [{ rotate: `${g.value}deg` }] }));
   return (

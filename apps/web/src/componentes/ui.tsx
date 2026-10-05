@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type CSSProperties, type InputHTMLAttributes, type ReactNode } from 'react';
-import { IcCheck, IcAlerta } from './iconos';
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type CSSProperties, type InputHTMLAttributes, type KeyboardEvent as TeclaReact, type ReactNode } from 'react';
+import { IcCheck, IcAlerta, IcChevron } from './iconos';
 
 /** Anima un número hacia su nuevo valor (montos que "cuentan"). */
 export function useContador(objetivo: number, duracion = 900): number {
@@ -34,6 +34,99 @@ export function Segmentado({ opciones, valor, onCambio, etiqueta, estilo }: { op
           {o}
         </button>
       ))}
+    </div>
+  );
+}
+
+/** Lista desplegable con el estilo de la app (el <select> nativo pinta sus opciones en una lista blanca). */
+export function Selector<T extends string>({ opciones, valor, onCambio, etiqueta }: { opciones: Array<{ valor: T; texto: string }>; valor: T; onCambio: (v: T) => void; etiqueta: string }) {
+  const [abierto, setAbierto] = useState(false);
+  const [activo, setActivo] = useState(0);
+  const raiz = useRef<HTMLDivElement>(null);
+  const lista = useRef<HTMLDivElement>(null);
+  const boton = useRef<HTMLButtonElement>(null);
+  const id = useId();
+  const elegido = Math.max(0, opciones.findIndex((o) => o.valor === valor));
+
+  // Un clic fuera la cierra.
+  useEffect(() => {
+    if (!abierto) return;
+    const fuera = (e: PointerEvent) => !raiz.current?.contains(e.target as Node) && setAbierto(false);
+    document.addEventListener('pointerdown', fuera);
+    return () => document.removeEventListener('pointerdown', fuera);
+  }, [abierto]);
+
+  // El foco sigue a la opción activa (flechas o mouse).
+  useEffect(() => {
+    if (abierto) lista.current?.querySelectorAll<HTMLElement>('[role="option"]')[activo]?.focus();
+  }, [abierto, activo]);
+
+  const abrir = () => {
+    setActivo(elegido);
+    setAbierto(true);
+  };
+  const cerrar = () => {
+    setAbierto(false);
+    boton.current?.focus();
+  };
+  const tecla = (e: TeclaReact) => {
+    const n = opciones.length;
+    if (e.key === 'ArrowDown') setActivo((activo + 1) % n);
+    else if (e.key === 'ArrowUp') setActivo((activo - 1 + n) % n);
+    else if (e.key === 'Home') setActivo(0);
+    else if (e.key === 'End') setActivo(n - 1);
+    else if (e.key === 'Escape') cerrar();
+    else {
+      if (e.key === 'Tab') setAbierto(false);
+      return;
+    }
+    e.preventDefault();
+  };
+
+  return (
+    <div ref={raiz} className={`sel ${abierto ? 'abierto' : ''}`}>
+      <button
+        ref={boton}
+        type="button"
+        className="sel-btn"
+        aria-haspopup="listbox"
+        aria-expanded={abierto}
+        aria-controls={abierto ? id : undefined}
+        aria-label={`${etiqueta}: ${opciones[elegido]?.texto ?? ''}`}
+        onClick={() => (abierto ? cerrar() : abrir())}
+        onKeyDown={(e) => {
+          if (!abierto && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+            e.preventDefault();
+            abrir();
+          }
+        }}
+      >
+        {opciones[elegido]?.texto}
+        <IcChevron tamano={14} />
+      </button>
+      {abierto && (
+        <div ref={lista} id={id} className="sel-lista" role="listbox" aria-label={etiqueta} onKeyDown={tecla}>
+          {opciones.map((o, i) => (
+            <button
+              key={o.valor}
+              type="button"
+              role="option"
+              aria-selected={i === elegido}
+              tabIndex={i === activo ? 0 : -1}
+              className={`sel-op ${i === elegido ? 'on' : ''}`}
+              onClick={() => {
+                onCambio(o.valor);
+                cerrar();
+              }}
+              onMouseEnter={() => setActivo(i)}
+              style={{ animationDelay: `${Math.min(i, 8) * 22}ms` }}
+            >
+              {o.texto}
+              {i === elegido && <IcCheck tamano={13} />}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

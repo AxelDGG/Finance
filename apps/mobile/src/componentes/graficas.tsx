@@ -12,7 +12,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { Circle, Defs, Ellipse, Line, LinearGradient as SvgGradient, Path, RadialGradient, Stop } from 'react-native-svg';
-import { color, fuente } from '../lib/tema';
+import { color, deslizar, fuente } from '../lib/tema';
 
 const CirculoAnimado = Animated.createAnimatedComponent(Circle);
 
@@ -109,7 +109,7 @@ export function Segmentado({
   // Ancho útil: sin bordes (2 × 1px) ni relleno (2 × 4px).
   const anchoOpcion = ancho > 0 ? (ancho - 10) / opciones.length : 0;
   useEffect(() => {
-    x.value = withSpring(valor * anchoOpcion, { damping: 16, stiffness: 180 });
+    x.value = withTiming(valor * anchoOpcion, deslizar);
   }, [valor, anchoOpcion, x]);
   const pulgar = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
   return (
@@ -264,8 +264,8 @@ export function GraficaProyeccion({
   const mx = useSharedValue(x(seleccion));
   const my = useSharedValue(y(puntos[seleccion]?.acumulado ?? 0));
   useEffect(() => {
-    mx.value = withSpring(x(seleccion), { damping: 14, stiffness: 160 });
-    my.value = withSpring(y(puntos[seleccion]?.acumulado ?? 0), { damping: 14, stiffness: 160 });
+    mx.value = withTiming(x(seleccion), deslizar);
+    my.value = withTiming(y(puntos[seleccion]?.acumulado ?? 0), deslizar);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seleccion, ancho, meta, n]);
   const marcador = useAnimatedStyle(() => ({ transform: [{ translateX: mx.value - 8 }, { translateY: my.value - 8 }] }));

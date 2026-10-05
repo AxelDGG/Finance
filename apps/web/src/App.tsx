@@ -3,6 +3,7 @@ import { nombreDia, nombreMes, partes } from '@finanzas/core';
 import { useEffect, useState } from 'react';
 import { BarraTitulo } from './componentes/BarraTitulo';
 import { IcCampana, IcMas } from './componentes/iconos';
+import { Logo } from './componentes/Logo';
 import { NuevoGasto } from './componentes/movimientos';
 import { Sidebar } from './componentes/Sidebar';
 import { AvisosProvider } from './componentes/ui';
@@ -144,7 +145,7 @@ function Cargando() {
   return (
     <div className="acceso">
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18 }}>
-        <span className="logo" style={{ width: 56, height: 56, fontSize: 28, borderRadius: 18 }}>F</span>
+        <Logo tamano={56} />
         <span className="pulse" />
       </div>
     </div>

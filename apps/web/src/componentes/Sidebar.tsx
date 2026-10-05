@@ -3,6 +3,7 @@ import { claveDia, etiquetaDia, hora } from '@finanzas/core';
 import { useEffect, useRef, useState } from 'react';
 import { navegar, type Ruta } from '../lib/ruta';
 import { pesos } from '../lib/movimientos';
+import { Logo } from './Logo';
 import { IcAjustes, IcApartados, IcCampana, IcChevron, IcContraer, IcMovimientos, IcResumen } from './iconos';
 
 const leerPreferencia = (clave: string, defecto: boolean) => {
@@ -73,8 +74,8 @@ export function Sidebar({ ruta }: { ruta: Ruta }) {
   return (
     <aside className={`side ${contraido ? 'contraido' : ''}`} aria-label="Menú">
       <div className="panel rise">
-        <div className="marca" style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12, minHeight: 44, paddingLeft: 8 }}>
-          <span className="logo">F</span>
+        <div className="marca">
+          <Logo />
           <span className="lbl" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 5 }}>
             <span className="metal display" style={{ fontSize: 21, letterSpacing: '0.05em' }}>FINANZAS</span>
             <span className="mono" style={{ fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--tenue)' }}>Control personal</span>

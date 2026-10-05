@@ -1,4 +1,13 @@
 // Mismo sistema visual que el diseño aprobado: fondo casi negro, plata y un solo acento violeta.
+import { Easing } from 'react-native-reanimated';
+
+/**
+ * Movimiento sin rebote: `deslizar` para selectores y marcadores, `suave` para
+ * aparecer y soltar botones. El resorte queda solo en la barra de pestañas y
+ * en las entradas de pantalla.
+ */
+export const deslizar = { duration: 420, easing: Easing.bezier(0.4, 0, 0.2, 1) };
+export const suave = { duration: 260, easing: Easing.out(Easing.cubic) };
 
 export const color = {
   fondo: '#08090B',

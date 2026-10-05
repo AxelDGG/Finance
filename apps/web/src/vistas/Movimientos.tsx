@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { DetalleMovimiento, FilaMovimiento } from '../componentes/movimientos';
 import { IcBuscar, IcCerrar, IcDescargar, IcSubir } from '../componentes/iconos';
 import { Importar } from '../componentes/Importar';
-import { Segmentado, useAvisos, Vacio } from '../componentes/ui';
+import { Segmentado, Selector, useAvisos, Vacio } from '../componentes/ui';
 import { navegar, type Ruta } from '../lib/ruta';
 import { descargar, enEscritorio } from '../lib/tauri';
 import { nombreMovimiento } from '../lib/movimientos';
@@ -85,14 +85,12 @@ export function Movimientos({ ruta }: { ruta: Ruta }) {
           </div>
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '0 4px', alignItems: 'center' }}>
-          <select className="input" aria-label="Mes" value={mes} onChange={(e) => setMes(e.target.value)} style={{ width: 'auto', height: 30, padding: '0 12px', borderRadius: 99, fontSize: 12.5 }}>
-            <option value="todos">Todos los meses</option>
-            {meses.map((p) => (
-              <option key={p} value={p}>
-                {nombrePeriodo(p, true).replace(/^./, (c) => c.toUpperCase())}
-              </option>
-            ))}
-          </select>
+          <Selector
+            etiqueta="Mes"
+            valor={mes}
+            onCambio={setMes}
+            opciones={[{ valor: 'todos', texto: 'Todos los meses' }, ...meses.map((p) => ({ valor: p, texto: nombrePeriodo(p, true).replace(/^./, (c) => c.toUpperCase()) }))]}
+          />
           {cuenta && (
             <button className="chip acc" onClick={() => navegar('movimientos', { q, cat: catId }, true)} aria-label={`Quitar filtro de cuenta ${cuenta.alias}`}>
               Cuenta: {cuenta.alias} <IcCerrar tamano={11} grosor={2.4} />

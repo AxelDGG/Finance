@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { alternarMaximizar, arrastrarVentana, cerrarVentana, minimizar } from '../lib/tauri';
 import { navegar, type Ruta } from '../lib/ruta';
 import { IcBuscar } from './iconos';
+import { Logo } from './Logo';
 
 /** Barra de título propia de la app de escritorio: buscador (Ctrl K) y botones de ventana. */
 export function BarraTitulo({ ruta }: { ruta: Ruta }) {
@@ -39,7 +40,7 @@ export function BarraTitulo({ ruta }: { ruta: Ruta }) {
   return (
     <div className="titlebar" onMouseDown={alPresionar}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingLeft: 18, minWidth: 0 }}>
-        <span className="display" style={{ display: 'grid', placeItems: 'center', width: 20, height: 20, borderRadius: 6, background: 'linear-gradient(180deg, #F6F6F8, #9EA2AA)', color: '#0A0B0D', fontSize: 11 }}>F</span>
+        <Logo tamano={20} className="" />
         <span style={{ fontSize: 12.5, color: 'var(--texto2)' }}>Finanzas</span>
       </div>
       <label className="cmd">

@@ -15,7 +15,7 @@ import { IconoAjustes, IconoAlerta, IconoCampana, IconoCheck, IconoFlechas } fro
 import { DetalleMovimiento, FilaMovimiento } from '../../componentes/movimientos';
 import { useContador } from '../../componentes/useContador';
 import { estadoLector, lectorDisponible } from '../../lib/lector';
-import { color } from '../../lib/tema';
+import { color, deslizar } from '../../lib/tema';
 
 export default function Inicio() {
   const insets = useSafeAreaInsets();
@@ -104,11 +104,11 @@ export default function Inicio() {
 
         {/* Por mover */}
         {r.pendientesPorMover.length > 0 && (
-          <Animated.View layout={LinearTransition.springify().damping(18)} style={{ gap: 10 }}>
+          <Animated.View layout={LinearTransition.duration(deslizar.duration).easing(deslizar.easing)} style={{ gap: 10 }}>
             {r.pendientesPorMover.map((p, i) => {
               const apartado = config.apartados.find((a) => a.id === p.apartado_id)?.nombre ?? 'Apartado';
               return (
-                <Animated.View key={p.id} exiting={FadeOutLeft.duration(300)} layout={LinearTransition.springify()}>
+                <Animated.View key={p.id} exiting={FadeOutLeft.duration(300)} layout={LinearTransition.duration(deslizar.duration).easing(deslizar.easing)}>
                   <Tarjeta retraso={120 + i * 60} style={{ padding: 14 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                       <View style={estilos.icono}>

@@ -12,7 +12,7 @@ import { Campo, CampoDinero } from '../componentes/formulario';
 import { Segmentado } from '../componentes/graficas';
 import { HojaInferior } from '../componentes/HojaInferior';
 import { IconoAtras } from '../componentes/iconos';
-import { color } from '../lib/tema';
+import { color, deslizar } from '../lib/tema';
 
 const TIPOS: TipoMovimiento[] = ['gasto', 'ingreso', 'interno'];
 
@@ -114,7 +114,7 @@ export default function Revisar() {
             const lectura = lecturaDeNotificacion(n);
             const app = APPS[resolverApp(n.app, n.titulo).app]?.nombre ?? n.app;
             return (
-              <Animated.View key={n.id} exiting={FadeOutLeft} layout={LinearTransition.springify()}>
+              <Animated.View key={n.id} exiting={FadeOutLeft} layout={LinearTransition.duration(deslizar.duration).easing(deslizar.easing)}>
                 <Tarjeta retraso={i * 50} style={{ padding: 16, gap: 10 }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <T v="semi" style={{ fontSize: 14 }}>{app}</T>

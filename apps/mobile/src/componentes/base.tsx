@@ -3,8 +3,8 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View, type PressableProps, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from 'react-native';
-import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
-import { color, fuente, radio } from '../lib/tema';
+import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { color, fuente, radio, suave } from '../lib/tema';
 
 // ---------------------------------------------------------------- texto
 
@@ -90,7 +90,7 @@ export function Presionable({
         props.onPressIn?.(e);
       }}
       onPressOut={(e) => {
-        s.value = withSpring(1, { damping: 12, stiffness: 260 });
+        s.value = withTiming(1, suave);
         props.onPressOut?.(e);
       }}
       onPress={(e) => {

@@ -69,7 +69,7 @@ pnpm typecheck
 | Instalador de Windows | en `apps/web`: `npx tauri build` |
 | Empaquetar la función `ingesta` | `pnpm build:functions` → `supabase/functions/ingesta/dist/index.js` (se publica con verify_jwt desactivado: la función valida la llave del dispositivo o tu sesión) |
 | Prueba de punta a punta contra Supabase | `FINANZAS_PRUEBA_PASSWORD=... node scripts/prueba-integracion.mjs` (usuario `prueba@finanzas.test`; la contraseña vive en `.env.prueba`, fuera de git) |
-| Regenerar íconos | `python scripts/generar-iconos.py` y luego, en `apps/web`, `npx tauri icon src-tauri/icono-fuente.png` |
+| Regenerar íconos | `python scripts/generar-iconos.py`; luego, en `apps/web`, `npx tauri icon src-tauri/icono-fuente.png` (borra `src-tauri/icons/android` e `icons/ios`, no se usan) y, en `apps/mobile`, `npx expo prebuild --platform android --no-install` antes de `pnpm apk`. Para que el `.exe` tome el ícono nuevo borra `apps/web/src-tauri/target/release/build/finanzas-*` antes de `npx tauri build` (Cargo guarda el ícono viejo) |
 
 **Notas de Windows para compilar Android:**
 
