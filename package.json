@@ -1,0 +1,21 @@
+{
+  "name": "finanzas",
+  "private": true,
+  "packageManager": "pnpm@10.12.4",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "build:functions": "node scripts/build-functions.mjs",
+    "apk": "node scripts/compilar-apk.mjs",
+    "web": "pnpm --filter @finanzas/web dev",
+    "web:build": "pnpm --filter @finanzas/web build",
+    "mobile": "pnpm --filter @finanzas/mobile start"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.117.2",
+    "esbuild": "^0.25.12"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@finanzas/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@finanzas/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@supabase/supabase-js": "^2",
+    "react": ">=19"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.117.2",
+    "@types/react": "~19.2.2",
+    "react": "19.2.3",
+    "typescript": "~5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

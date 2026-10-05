@@ -1,0 +1,48 @@
+# dependencias
+node_modules/
+.pnpm-store/
+
+# builds
+dist/
+build/
+*.tsbuildinfo
+.expo/
+.expo-shared/
+web-build/
+
+# android / gradle
+apps/mobile/android/
+apps/mobile/android/app/build/
+apps/mobile/android/build/
+apps/mobile/android/local.properties
+*.apk
+*.aab
+*.keystore
+!debug.keystore
+
+# tauri
+apps/web/src-tauri/target/
+apps/web/src-tauri/gen/
+
+# variables de entorno (nunca subir llaves)
+.env
+.env.*
+!.env.example
+
+# supabase local
+supabase/.temp/
+supabase/.branches/
+
+# sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.log
+
+# registros de compilación
+*.log
+
+# Llave de firma de Android (secreta)
+apps/mobile/credenciales/

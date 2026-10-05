@@ -1,0 +1,25 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <!-- Avisos propios: "Llegó tu ingreso, te toca apartar…" -->
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <!-- Para pedir que Android no "duerma" el lector (la app no va a Play Store). -->
+  <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+  <application>
+    <!-- Lector de notificaciones: Android lo mantiene vivo aunque la app esté cerrada. -->
+    <service
+      android:name="expo.modules.lectornotificaciones.ServicioLector"
+      android:label="Finanzas · lector de pagos"
+      android:exported="true"
+      android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+      <intent-filter>
+        <action android:name="android.service.notification.NotificationListenerService" />
+      </intent-filter>
+      <meta-data
+        android:name="android.service.notification.default_filter_types"
+        android:value="alerting|silent" />
+    </service>
+  </application>
+</manifest>
