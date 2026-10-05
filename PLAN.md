@@ -204,10 +204,10 @@ El dinero se guarda en **centavos enteros**, nunca como decimales, para evitar e
 
 | Fase | Estado | Notas |
 |---|---|---|
-| 0 · Cimientos | ✅ | Monorepo pnpm, Supabase con RLS. Falta subirlo a GitHub (no hay `gh` en esta computadora). |
+| 0 · Cimientos | ✅ | Monorepo pnpm, Supabase con RLS, código en github.com/AxelDGG/Finance. |
 | 1 · Capturador | ✅ | Módulo Kotlin con cola SQLite y WorkManager. Probado en emulador; la prueba con tus avisos reales empieza al instalar el APK. |
 | 2 · Núcleo | ✅ | `packages/core` con 66 pruebas; función `ingesta` v2 publicada; prueba de integración de 25 puntos en verde. |
-| 3 · App Android | 🟡 | Todas las pantallas del diseño, captura manual, Por revisar, Por mover, cierre de mes. Firma release lista; falta que el APK release empaquete el JS al compilar desde `W:` (Metro no resuelve `@finanzas/*`). |
-| 4 · Web y escritorio | ✅ | React + Vite con el diseño aprobado (animaciones con CSS en lugar de Motion: menos peso, mismo efecto), PWA, tiempo real, modo demostración. Publicar en Vercel queda a tu decisión. |
+| 3 · App Android | ✅ | Todas las pantallas del diseño, captura manual, Por revisar, Por mover, cierre de mes. APK release firmado con `pnpm apk`. |
+| 4 · Web y escritorio | ✅ | React + Vite con el diseño aprobado, PWA, tiempo real, modo demostración, cabeceras de seguridad (CSP) listas para Vercel. |
 | 5 · Pulido | ✅ | Recordatorios (avisos al llegar un ingreso), cierre de mes, exportar CSV, conciliación con estado de cuenta e instalador de Windows (Tauri). |
 
