@@ -23,6 +23,8 @@ export function Movimientos({ ruta }: { ruta: Ruta }) {
   const [importando, setImportando] = useState(false);
   const q = ruta.params.get('q') ?? '';
   const cuentaId = ruta.params.get('cuenta');
+  const catId = ruta.params.get('cat');
+  const categoria = config.categorias.find((c) => c.id === catId);
   const selId = ruta.params.get('sel');
   const cuenta = config.cuentas.find((c) => c.id === cuentaId);
   const seleccionado = movimientos.find((m) => m.id === selId) ?? null;
@@ -36,12 +38,13 @@ export function Movimientos({ ruta }: { ruta: Ruta }) {
       (m) =>
         (!tipo || m.tipo === tipo) &&
         (!cuentaId || m.cuenta_id === cuentaId) &&
+        (!catId || m.categoria_id === catId) &&
         (mes === 'todos' || periodoDe(m.fecha) === mes) &&
         (!busqueda || normalizar(`${nombreMovimiento(m, config)} ${m.descripcion ?? ''}`).includes(busqueda)),
     );
-  }, [movimientos, filtro, cuentaId, mes, q, config]);
+  }, [movimientos, filtro, cuentaId, catId, mes, q, config]);
 
-  useEffect(() => setLimite(POR_PAGINA), [filtro, cuentaId, mes, q]);
+  useEffect(() => setLimite(POR_PAGINA), [filtro, cuentaId, catId, mes, q]);
 
   const sumaGastos = lista.filter(esGasto).reduce((a, m) => a + m.monto_centavos, 0);
   const sumaIngresos = lista.filter(esIngreso).reduce((a, m) => a + m.monto_centavos, 0);
@@ -60,8 +63,8 @@ export function Movimientos({ ruta }: { ruta: Ruta }) {
     if (esGasto(m)) g.total += m.monto_centavos;
   }
 
-  const abrir = (m: Movimiento) => navegar('movimientos', { q, cuenta: cuentaId, sel: m.id === selId ? null : m.id }, true);
-  const buscar = (texto: string) => navegar('movimientos', { q: texto, cuenta: cuentaId, sel: selId }, true);
+  const abrir = (m: Movimiento) => navegar('movimientos', { q, cuenta: cuentaId, cat: catId, sel: m.id === selId ? null : m.id }, true);
+  const buscar = (texto: string) => navegar('movimientos', { q: texto, cuenta: cuentaId, cat: catId, sel: selId }, true);
 
   const exportar = () => {
     if (lista.length === 0) return avisar('No hay movimientos para exportar con ese filtro.', true);
@@ -91,8 +94,13 @@ export function Movimientos({ ruta }: { ruta: Ruta }) {
             ))}
           </select>
           {cuenta && (
-            <button className="chip acc" onClick={() => navegar('movimientos', { q }, true)} aria-label={`Quitar filtro de cuenta ${cuenta.alias}`}>
+            <button className="chip acc" onClick={() => navegar('movimientos', { q, cat: catId }, true)} aria-label={`Quitar filtro de cuenta ${cuenta.alias}`}>
               Cuenta: {cuenta.alias} <IcCerrar tamano={11} grosor={2.4} />
+            </button>
+          )}
+          {categoria && (
+            <button className="chip acc" onClick={() => navegar('movimientos', { q, cuenta: cuentaId }, true)} aria-label={`Quitar filtro de categoría ${categoria.nombre}`}>
+              Categoría: {categoria.nombre} <IcCerrar tamano={11} grosor={2.4} />
             </button>
           )}
           <span className="chip">
@@ -130,7 +138,7 @@ export function Movimientos({ ruta }: { ruta: Ruta }) {
         </div>
       </section>
 
-      {seleccionado && <DetalleMovimiento m={seleccionado} onCerrar={() => navegar('movimientos', { q, cuenta: cuentaId }, true)} />}
+      {seleccionado && <DetalleMovimiento m={seleccionado} onCerrar={() => navegar('movimientos', { q, cuenta: cuentaId, cat: catId }, true)} />}
       <Importar abierto={importando} onCerrar={() => setImportando(false)} />
     </div>
   );

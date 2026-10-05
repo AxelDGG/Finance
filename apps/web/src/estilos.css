@@ -203,6 +203,22 @@ select.input { appearance: none; cursor: pointer; }
 .pulse.apagado { background: var(--peligro); }
 .pulse.apagado::after { background: var(--peligro); }
 @keyframes pulso { from { transform: scale(1); opacity: 0.6; } to { transform: scale(3.2); opacity: 0; } }
+/* Barras apiladas por categoría */
+.apil { position: relative; flex: 1 1 0; max-width: 56px; margin: 0 auto; display: flex; flex-direction: column-reverse; gap: 2px; padding: 0; border: 0; border-radius: 10px 10px 5px 5px; overflow: hidden; background: transparent; cursor: pointer; transform-origin: bottom; animation: crecer 1s var(--suave) backwards; opacity: 0.62; transition: opacity 0.35s, box-shadow 0.35s, transform 0.35s var(--resorte); }
+.apil:hover, .apil.on { opacity: 1; }
+.apil.on { box-shadow: 0 0 0 1px rgba(201, 193, 255, 0.35), 0 14px 32px -8px rgba(154, 141, 242, 0.55); transform: translateY(-2px); }
+.apil-seg { display: block; min-height: 3px; transition: opacity 0.3s, filter 0.3s; }
+.apil-seg.dim { opacity: 0.18; }
+/* Recomendaciones y comparación */
+.reco { display: flex; gap: 14px; align-items: flex-start; padding: 14px; border-radius: 16px; border: 1px solid var(--borde); background: rgba(255, 255, 255, 0.02); transition: background 0.25s, transform 0.3s var(--suave), border-color 0.25s; }
+.reco.accionable { cursor: pointer; }
+.reco.accionable:hover { background: rgba(255, 255, 255, 0.045); transform: translateY(-2px); }
+.reco.accionable:active { transform: scale(0.99); }
+.reco:hover .go { transform: translateX(3px); }
+.reco .go { transition: transform 0.3s var(--resorte); }
+.comp { all: unset; box-sizing: border-box; display: flex; flex-direction: column; gap: 7px; padding: 8px 10px; border-radius: 12px; cursor: pointer; transition: background 0.25s, transform 0.3s var(--suave); }
+.comp:hover { background: rgba(255, 255, 255, 0.04); transform: translateX(3px); }
+.comp:focus-visible { outline: 2px solid #b7adff; }
 .trazo { stroke-dasharray: 1; animation: trazo 1.4s var(--suave) 0.2s backwards; }
 @keyframes trazo { from { stroke-dashoffset: 1; } }
 .aparecer { animation: aparecer 0.9s ease 0.6s backwards; }

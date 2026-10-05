@@ -1,6 +1,7 @@
 import { useDatos, useResumen } from '@finanzas/api';
 import { diasEnMes, nombrePeriodo, partes } from '@finanzas/core';
 import { useState } from 'react';
+import { EnQueSeVa, Recomendaciones } from '../componentes/analisis';
 import { Dona, GraficaBarras } from '../componentes/graficas';
 import { IcDestello, IcFlecha, IcTelefono } from '../componentes/iconos';
 import { FilaMovimiento } from '../componentes/movimientos';
@@ -118,6 +119,8 @@ export function Resumen() {
         </div>
       </div>
 
+      <Recomendaciones lista={r.analisis.recomendaciones} />
+
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
         <section className="card rise" style={{ flex: '999 1 520px', minWidth: 0, padding: 24, display: 'flex', flexDirection: 'column', gap: 8, animationDelay: '320ms' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
@@ -156,6 +159,8 @@ export function Resumen() {
           <Dona categorias={r.categorias} total={r.resumen.gastado} />
         </section>
       </div>
+
+      <EnQueSeVa porCategoriaMeses={r.analisis.porCategoriaMeses} cambios={r.analisis.cambiosCategoria} comercios={r.analisis.comercios} />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 330px), 1fr))', gap: 20 }}>
         <section className="card lift rise" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 22, animationDelay: '480ms' }}>

@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { Boton, Chip, Entrada, Presionable, T, Tarjeta, TextoMetal } from '../../componentes/base';
 import { BotonIcono, Encabezado } from '../../componentes/Encabezado';
+import { EnQueSeVa, Recomendaciones } from '../../componentes/analisis';
 import { Anillo, BarraProgreso, GraficaBarras } from '../../componentes/graficas';
 import { IconoAjustes, IconoAlerta, IconoCampana, IconoCheck, IconoFlechas } from '../../componentes/iconos';
 import { DetalleMovimiento, FilaMovimiento } from '../../componentes/movimientos';
@@ -157,6 +158,10 @@ export default function Inicio() {
           </View>
           <GraficaBarras puntos={dias} seleccion={diaSel} onSeleccion={setDiaSel} tope={tope} />
         </Tarjeta>
+
+        {/* Recomendaciones y en qué se va el dinero */}
+        <Recomendaciones lista={r.analisis.recomendaciones} retraso={200} />
+        <EnQueSeVa porCategoriaMeses={r.analisis.porCategoriaMeses} cambios={r.analisis.cambiosCategoria} comercios={r.analisis.comercios} retraso={220} />
 
         {/* Apartados */}
         <Entrada retraso={240} style={{ gap: 4 }}>

@@ -3,12 +3,15 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { Apartado, ConfigUsuario, Movimiento, NotificacionCruda, PorMover } from '@finanzas/core';
 import {
   claveDia,
+  compararCategorias,
   esGasto,
+  gastosPorCategoriaMeses,
   gastosPorCategoria,
   partes,
   periodoDe,
   presupuestoDelMes,
   progresoMeta,
+  recomendaciones,
   proyeccionMeta,
   rangoPeriodo,
   resumenMes,
@@ -16,6 +19,7 @@ import {
   serieMeses,
   serieSemanasMes,
   sumarMeses,
+  topComercios,
   type ProgresoMeta,
   type PuntoProyeccion,
 } from '@finanzas/core';
@@ -255,6 +259,21 @@ export function useResumen(ahora: Date = new Date()) {
       .map((a) => ({ apartado: a, progreso: progresoMeta(a, todos, config, momento), proyeccion: proyeccionMeta(a, todos, config, momento) }));
 
     const porMoverMes = porMover.filter((p) => p.periodo === periodo || !p.hecho_en);
+    const pendientesPorMover = porMoverMes.filter((p) => !p.hecho_en);
+    // En qué se va el dinero y qué conviene hacer.
+    const analisis = {
+      cambiosCategoria: compararCategorias(movimientos, config.categorias, momento),
+      comercios: topComercios(movimientos, periodo, 6),
+      porCategoriaMeses: gastosPorCategoriaMeses(movimientos, config.categorias, momento, 6),
+      recomendaciones: recomendaciones({
+        movimientos,
+        categorias: config.categorias,
+        presupuesto: presupuesto.total,
+        metas: metas.map((m) => ({ nombre: m.apartado.nombre, meta: m.progreso.meta, aporte: m.progreso.aporte, lograda: m.progreso.lograda })),
+        pendientePorMover: pendientesPorMover.reduce((a, p) => a + p.monto_centavos, 0),
+        ahora: momento,
+      }),
+    };
     return {
       periodo,
       movsMes,
@@ -269,7 +288,8 @@ export function useResumen(ahora: Date = new Date()) {
       metas,
       gastos: config.apartados.find((a) => a.tipo === 'gastos') ?? null,
       porMoverMes,
-      pendientesPorMover: porMoverMes.filter((p) => !p.hecho_en),
+      pendientesPorMover,
+      analisis,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config, movimientos, aportacionesViejas, porMover, dia]);

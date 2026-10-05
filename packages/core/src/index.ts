@@ -10,3 +10,4 @@ export * from './reparto.ts';
 export * from './resumen.ts';
 export * from './metas.ts';
 export * from './csv.ts';
+export * from './analisis.ts';
