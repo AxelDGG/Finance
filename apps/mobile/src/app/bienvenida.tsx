@@ -21,6 +21,7 @@ const BANCOS: Array<{ clave: ClaveBanco; banco: Banco; nombre: string }> = [
 interface FuenteBorrador {
   nombre: string;
   monto: string;
+  quincenal: boolean;
   cuenta: ClaveBanco;
   reglas: Record<string, number>;
 }
@@ -48,7 +49,7 @@ export default function Bienvenida() {
   const [usados, setUsados] = useState<Record<ClaveBanco, boolean>>({ bbva: false, santander: false });
   const [terminaciones, setTerminaciones] = useState<Record<ClaveBanco, string>>({ bbva: '', santander: '' });
   const [cuentaGastos, setCuentaGastos] = useState<ClaveBanco>('bbva');
-  const [fuentes, setFuentes] = useState<FuenteBorrador[]>([{ nombre: '', monto: '', cuenta: 'bbva', reglas: {} }]);
+  const [fuentes, setFuentes] = useState<FuenteBorrador[]>([{ nombre: '', monto: '', quincenal: false, cuenta: 'bbva', reglas: {} }]);
   const [metas, setMetas] = useState<MetaBorrador[]>([]);
 
   // "Atrás" del teléfono regresa al paso anterior en lugar de salir del asistente.
@@ -79,7 +80,7 @@ export default function Bienvenida() {
     const config: ConfiguracionInicial = {
       cuentas: elegidos.map((b) => ({ clave: b.clave, banco: b.banco, alias: b.nombre, terminaciones: soloDigitos(terminaciones[b.clave]), es_principal: bancoValido(cuentaGastos) === b.clave })),
       cuentaGastos: bancoValido(cuentaGastos),
-      fuentes: fuentesValidas.map((f) => ({ nombre: f.nombre.trim(), cuenta: bancoValido(f.cuenta), monto_esperado_centavos: leerMonto(f.monto)!, reglas: f.reglas })),
+      fuentes: fuentesValidas.map((f) => ({ nombre: f.nombre.trim(), cuenta: bancoValido(f.cuenta), monto_esperado_centavos: leerMonto(f.monto)!, frecuencia: f.quincenal ? 'quincenal' : 'mensual', reglas: f.reglas })),
       metas: metasValidas.map((m, i) => ({
         clave: m.clave,
         nombre: m.nombre.trim(),
@@ -165,6 +166,8 @@ export default function Bienvenida() {
                 <Tarjeta key={i} style={{ padding: 18, gap: 14 }} retraso={i * 80}>
                   <Campo etiqueta="Nombre" value={f.nombre} onChangeText={(t) => cambiarFuente(i, { nombre: t })} placeholder="Ej. Sueldo" />
                   <CampoDinero etiqueta="Monto al mes" valor={f.monto} onCambio={(t) => cambiarFuente(i, { monto: t })} placeholder="0" />
+                  <T v="eyebrow">¿Cada cuándo?</T>
+                  <Segmentado opciones={['Al mes', 'Quincenal']} valor={f.quincenal ? 1 : 0} onCambio={(k) => cambiarFuente(i, { quincenal: k === 1 })} />
                   {elegidos.length > 1 && (
                     <>
                       <T v="eyebrow">Llega a</T>
@@ -174,7 +177,7 @@ export default function Bienvenida() {
                   {fuentes.length > 1 && <Boton titulo="Quitar este ingreso" variante="fantasma" onPress={() => setFuentes((fs) => fs.filter((_, j) => j !== i))} />}
                 </Tarjeta>
               ))}
-              <Boton titulo="Agregar otro ingreso" variante="secundario" onPress={() => setFuentes((fs) => [...fs, { nombre: '', monto: '', cuenta: elegidos[0]?.clave ?? 'bbva', reglas: {} }])} />
+              <Boton titulo="Agregar otro ingreso" variante="secundario" onPress={() => setFuentes((fs) => [...fs, { nombre: '', monto: '', quincenal: false, cuenta: elegidos[0]?.clave ?? 'bbva', reglas: {} }])} />
             </>
           )}
 

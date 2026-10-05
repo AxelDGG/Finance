@@ -60,6 +60,7 @@ function EditorFuente({ fuente, metas, retraso }: { fuente?: FuenteIngreso; meta
   const [nombre, setNombre] = useState(fuente?.nombre ?? '');
   const [monto, setMonto] = useState(aTexto(fuente?.monto_esperado_centavos));
   const [cuenta, setCuenta] = useState(Math.max(0, config.cuentas.findIndex((c) => c.id === fuente?.cuenta_id)));
+  const [quincenal, setQuincenal] = useState(fuente?.frecuencia === 'quincenal');
   const [reglas, setReglas] = useState<Record<string, number>>(() =>
     Object.fromEntries(metas.map((m) => [m.id, fuente ? porcentajeDe(fuente.id, m.id, config.reglas, config.apartados) : 0])),
   );
@@ -76,7 +77,7 @@ function EditorFuente({ fuente, metas, retraso }: { fuente?: FuenteIngreso; meta
     }
     setGuardando(true);
     try {
-      const guardada = await acciones.guardarFuente({ id: fuente?.id, nombre: nombre.trim(), monto_esperado_centavos: centavos, cuenta_id: config.cuentas[cuenta]?.id ?? null });
+      const guardada = await acciones.guardarFuente({ id: fuente?.id, nombre: nombre.trim(), monto_esperado_centavos: centavos, frecuencia: quincenal ? 'quincenal' : 'mensual', cuenta_id: config.cuentas[cuenta]?.id ?? null });
       await acciones.guardarReglas(guardada.id, Object.entries(reglas).map(([apartado_id, porcentaje]) => ({ apartado_id, porcentaje })));
       if (!fuente) {
         setNombre('');
@@ -102,6 +103,9 @@ function EditorFuente({ fuente, metas, retraso }: { fuente?: FuenteIngreso; meta
     <Tarjeta retraso={retraso} style={{ padding: 18, gap: 14 }}>
       <Campo etiqueta="Nombre" value={nombre} onChangeText={setNombre} placeholder="Ej. Ingreso principal" />
       <CampoDinero etiqueta="Monto al mes" valor={monto} onCambio={setMonto} />
+      <T v="eyebrow">¿Cada cuándo te pagan?</T>
+      <Segmentado opciones={['Al mes', 'Cada quincena']} valor={quincenal ? 1 : 0} onCambio={(i) => setQuincenal(i === 1)} />
+      {quincenal && centavos > 0 ? <T v="pequeno">Dos depósitos de {formatoMXN(Math.round(centavos / 2))}.</T> : null}
       {config.cuentas.length > 0 && (
         <>
           <T v="eyebrow">Llega a</T>

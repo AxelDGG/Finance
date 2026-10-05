@@ -2,6 +2,7 @@ import type { EventoParseado } from './parsers/index.ts';
 import type { Aviso, ConfigUsuario, Cuenta, EstadoNotificacion, FuenteIngreso, TipoMovimiento } from './tipos.ts';
 import { categoriaPorNombre, sugerirCategoria } from './categorias.ts';
 import { normalizar, normalizarComercio } from './texto.ts';
+import { montoPorDeposito } from './fuentes.ts';
 
 /** Movimiento listo para guardarse (sin id). */
 export interface MovimientoPropuesto {
@@ -72,10 +73,11 @@ export function encontrarFuente(
   const candidatas = fuentes
     .filter((f) => f.activo)
     .filter((f) => !f.cuenta_id || !cuentaId || f.cuenta_id === cuentaId)
-    .filter((f) => Math.abs(monto - f.monto_esperado_centavos) <= (f.monto_esperado_centavos * f.tolerancia_pct) / 100)
+    // Con quincenal, cada depósito se compara contra la mitad del total del mes.
+    .filter((f) => Math.abs(monto - montoPorDeposito(f)) <= (montoPorDeposito(f) * f.tolerancia_pct) / 100)
     .filter((f) => f.palabras_clave.length === 0 || f.palabras_clave.some((p) => contraparte.includes(normalizar(p))));
   candidatas.sort(
-    (a, b) => Math.abs(monto - a.monto_esperado_centavos) / a.monto_esperado_centavos - Math.abs(monto - b.monto_esperado_centavos) / b.monto_esperado_centavos,
+    (a, b) => Math.abs(monto - montoPorDeposito(a)) / montoPorDeposito(a) - Math.abs(monto - montoPorDeposito(b)) / montoPorDeposito(b),
   );
   return candidatas[0] ?? null;
 }

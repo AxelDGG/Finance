@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Apartado, Aviso, Banco, Cuenta, FuenteIngreso, Movimiento, NotificacionCruda, TipoMovimiento } from '@finanzas/core';
+import type { Apartado, Aviso, Banco, Cuenta, Frecuencia, FuenteIngreso, Movimiento, NotificacionCruda, TipoMovimiento } from '@finanzas/core';
 import { APPS, categoriaPorNombre, parsearNotificacion, periodoDe, resolverApp } from '@finanzas/core';
 import { descripcionSobrante } from './textos.ts';
 
@@ -143,6 +143,7 @@ export async function guardarFuente(db: SupabaseClient, f: Partial<FuenteIngreso
     nombre: f.nombre,
     cuenta_id: f.cuenta_id ?? null,
     monto_esperado_centavos: f.monto_esperado_centavos,
+    frecuencia: f.frecuencia ?? 'mensual',
     tolerancia_pct: f.tolerancia_pct ?? 20,
     palabras_clave: f.palabras_clave ?? [],
     activo: f.activo ?? true,
@@ -224,7 +225,7 @@ export interface ConfiguracionInicial {
   cuentas: Array<{ clave: string; banco: Banco; alias: string; terminaciones: string[]; es_principal: boolean }>;
   /** Clave de la cuenta donde vive "Gastos personales". */
   cuentaGastos: string;
-  fuentes: Array<{ nombre: string; cuenta: string; monto_esperado_centavos: number; reglas: Record<string, number> }>;
+  fuentes: Array<{ nombre: string; cuenta: string; monto_esperado_centavos: number; frecuencia?: Frecuencia; reglas: Record<string, number> }>;
   metas: Array<{ clave: string; nombre: string; descripcion: string | null; meta_centavos: number | null; saldo_inicial_centavos: number; destino: string | null; color: string }>;
 }
 
@@ -244,7 +245,7 @@ export async function aplicarConfiguracionInicial(db: SupabaseClient, c: Configu
     idsMeta[meta.clave] = creada.id;
   }
   for (const fuente of c.fuentes) {
-    const creada = await guardarFuente(db, { nombre: fuente.nombre, cuenta_id: idsCuenta[fuente.cuenta] ?? null, monto_esperado_centavos: fuente.monto_esperado_centavos });
+    const creada = await guardarFuente(db, { nombre: fuente.nombre, cuenta_id: idsCuenta[fuente.cuenta] ?? null, monto_esperado_centavos: fuente.monto_esperado_centavos, frecuencia: fuente.frecuencia ?? 'mensual' });
     await guardarReglas(
       db,
       creada.id,

@@ -24,7 +24,7 @@ function revisar<T>(r: { data: T | null; error: { message: string } | null }): T
 export async function cargarConfig(db: SupabaseClient): Promise<ConfigUsuario> {
   const [cuentas, fuentes, apartados, reglas, categorias, reglasCategoria] = await Promise.all([
     db.from('cuentas').select('id,banco,alias,terminaciones,es_principal').order('creado_en'),
-    db.from('fuentes_ingreso').select('id,nombre,cuenta_id,monto_esperado_centavos,tolerancia_pct,palabras_clave,activo').order('creado_en'),
+    db.from('fuentes_ingreso').select('id,nombre,cuenta_id,monto_esperado_centavos,frecuencia,tolerancia_pct,palabras_clave,activo').order('creado_en'),
     db.from('apartados').select('id,nombre,tipo,descripcion,cuenta_id,destino,meta_centavos,saldo_inicial_centavos,color,orden,archivado').order('orden'),
     db.from('reglas_reparto').select('id,fuente_id,apartado_id,porcentaje'),
     db.from('categorias').select('id,nombre,color,orden').order('orden'),

@@ -1,6 +1,7 @@
 import type { Categoria, ConfigUsuario, Movimiento } from './tipos.ts';
 import { claveDia, diasEnMes, diasRestantesMes, nombreDia, nombrePeriodo, partes, periodoDe, sumarMeses } from './fechas.ts';
 import { porcentajeGastos } from './reparto.ts';
+import { depositosPorMes, montoPorDeposito } from './fuentes.ts';
 
 export const confirmado = (m: Movimiento) => m.estado === 'confirmado';
 export const esGasto = (m: Movimiento) => m.tipo === 'gasto' && confirmado(m);
@@ -34,10 +35,13 @@ export function presupuestoDelMes(config: Pick<ConfigUsuario, 'fuentes' | 'regla
   const porFuente = config.fuentes
     .filter((f) => f.activo)
     .map((f) => {
-      const recibido = suma(ingresos.filter((m) => m.fuente_id === f.id));
-      const base = recibido > 0 ? recibido : f.monto_esperado_centavos;
+      const depositos = ingresos.filter((m) => m.fuente_id === f.id);
+      const recibido = suma(depositos);
+      // Quincenal: lo que ya llegó más las quincenas que faltan. Mensual: lo real si ya llegó.
+      const faltan = Math.max(0, depositosPorMes(f) - depositos.length);
+      const base = f.frecuencia === 'quincenal' ? recibido + faltan * montoPorDeposito(f) : recibido > 0 ? recibido : f.monto_esperado_centavos;
       const porcentaje = porcentajeGastos(f.id, config.reglas, config.apartados);
-      return { fuente_id: f.id, nombre: f.nombre, base, recibido: recibido > 0, porcentaje, monto: Math.round((base * porcentaje) / 100) };
+      return { fuente_id: f.id, nombre: f.nombre, base, recibido: faltan === 0, porcentaje, monto: Math.round((base * porcentaje) / 100) };
     });
   const idsFuentes = new Set(config.fuentes.map((f) => f.id));
   const extras = suma(ingresos.filter((m) => !m.fuente_id || !idsFuentes.has(m.fuente_id)));

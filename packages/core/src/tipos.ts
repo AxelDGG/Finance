@@ -31,11 +31,17 @@ export interface Apartado {
   archivado: boolean;
 }
 
+/** mensual: un depósito al mes; quincenal: dos depósitos de la mitad. */
+export type Frecuencia = 'mensual' | 'quincenal';
+
 export interface FuenteIngreso {
   id: string;
   nombre: string;
   cuenta_id: string | null;
+  /** Total que llega en el mes (con quincenal, la suma de las dos quincenas). */
   monto_esperado_centavos: number;
+  /** Si falta, se toma como mensual. */
+  frecuencia?: Frecuencia;
   tolerancia_pct: number;
   palabras_clave: string[];
   activo: boolean;

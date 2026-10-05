@@ -119,7 +119,7 @@ export function Apartados({ ruta }: { ruta: Ruta }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <span style={{ fontSize: 16, fontWeight: 600 }}>{f.nombre}</span>
-                    <span style={{ fontSize: 13, color: '#9A9DA6' }}>Llega a {cuenta?.alias ?? '—'} · cada mes</span>
+                    <span style={{ fontSize: 13, color: '#9A9DA6' }}>Llega a {cuenta?.alias ?? '—'} · {f.frecuencia === 'quincenal' ? `cada quincena (${pesos(Math.round(f.monto_esperado_centavos / 2))})` : 'cada mes'}</span>
                   </div>
                   <span className="display" style={{ fontSize: 30 }}>{pesos(f.monto_esperado_centavos)}</span>
                 </div>

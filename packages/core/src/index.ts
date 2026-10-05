@@ -11,3 +11,4 @@ export * from './resumen.ts';
 export * from './metas.ts';
 export * from './csv.ts';
 export * from './analisis.ts';
+export * from './fuentes.ts';

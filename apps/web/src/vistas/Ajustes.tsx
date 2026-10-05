@@ -178,6 +178,7 @@ function EditorFuente({ fuente, metas }: { fuente?: FuenteIngreso; metas: Aparta
   const [nombre, setNombre] = useState(fuente?.nombre ?? '');
   const [monto, setMonto] = useState(aTexto(fuente?.monto_esperado_centavos));
   const [cuenta, setCuenta] = useState(Math.max(0, config.cuentas.findIndex((c) => c.id === fuente?.cuenta_id)));
+  const [quincenal, setQuincenal] = useState(fuente?.frecuencia === 'quincenal');
   const [reglas, setReglas] = useState<Record<string, number>>(() => Object.fromEntries(metas.map((m) => [m.id, fuente ? porcentajeDe(fuente.id, m.id, config.reglas, config.apartados) : 0])));
   const [guardando, setGuardando] = useState(false);
   const total = metas.reduce((a, m) => a + (reglas[m.id] ?? 0), 0);
@@ -194,7 +195,7 @@ function EditorFuente({ fuente, metas }: { fuente?: FuenteIngreso; metas: Aparta
     if (!nombre.trim() || !centavos) return avisar('Escribe el nombre y el monto del ingreso.', true);
     setGuardando(true);
     try {
-      const guardada = await acciones.guardarFuente({ id: fuente?.id, nombre: nombre.trim(), monto_esperado_centavos: centavos, cuenta_id: config.cuentas[cuenta]?.id ?? null });
+      const guardada = await acciones.guardarFuente({ id: fuente?.id, nombre: nombre.trim(), monto_esperado_centavos: centavos, frecuencia: quincenal ? 'quincenal' : 'mensual', cuenta_id: config.cuentas[cuenta]?.id ?? null });
       await acciones.guardarReglas(guardada.id, Object.entries(reglas).map(([apartado_id, porcentaje]) => ({ apartado_id, porcentaje })));
       if (!fuente) {
         setNombre('');
@@ -219,6 +220,11 @@ function EditorFuente({ fuente, metas }: { fuente?: FuenteIngreso; metas: Aparta
     <div className="card" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 16 }}>
       <Campo etiqueta="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej. Ingreso principal" />
       <CampoDinero etiqueta="Monto al mes" valor={monto} onCambio={setMonto} />
+      <div className="etiqueta">
+        <span className="eyebrow">¿Cada cuándo te pagan?</span>
+        <Segmentado etiqueta="Frecuencia" opciones={['Una vez al mes', 'Cada quincena']} valor={quincenal ? 1 : 0} onCambio={(i) => setQuincenal(i === 1)} />
+        {quincenal && centavos > 0 && <span style={{ fontSize: 12, color: 'var(--texto3)' }}>Dos depósitos de {formatoMXN(Math.round(centavos / 2), { decimales: 'nunca' })}.</span>}
+      </div>
       {config.cuentas.length > 0 && (
         <div className="etiqueta">
           <span className="eyebrow">Llega a</span>

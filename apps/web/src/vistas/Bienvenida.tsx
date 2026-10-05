@@ -16,6 +16,7 @@ const BANCOS: Array<{ clave: ClaveBanco; banco: Banco; nombre: string }> = [
 interface FuenteBorrador {
   nombre: string;
   monto: string;
+  quincenal: boolean;
   cuenta: ClaveBanco;
   reglas: Record<string, number>;
 }
@@ -46,7 +47,7 @@ export function Bienvenida() {
   const [usados, setUsados] = useState<Record<ClaveBanco, boolean>>({ bbva: false, santander: false });
   const [terminaciones, setTerminaciones] = useState<Record<ClaveBanco, string>>({ bbva: '', santander: '' });
   const [cuentaGastos, setCuentaGastos] = useState<ClaveBanco>('bbva');
-  const [fuentes, setFuentes] = useState<FuenteBorrador[]>([{ nombre: '', monto: '', cuenta: 'bbva', reglas: {} }]);
+  const [fuentes, setFuentes] = useState<FuenteBorrador[]>([{ nombre: '', monto: '', quincenal: false, cuenta: 'bbva', reglas: {} }]);
   const [metas, setMetas] = useState<MetaBorrador[]>([]);
 
   const elegidos = BANCOS.filter((b) => usados[b.clave]);
@@ -69,7 +70,7 @@ export function Bienvenida() {
     const config: ConfiguracionInicial = {
       cuentas: elegidos.map((b) => ({ clave: b.clave, banco: b.banco, alias: b.nombre, terminaciones: soloDigitos(terminaciones[b.clave]), es_principal: bancoValido(cuentaGastos) === b.clave })),
       cuentaGastos: bancoValido(cuentaGastos),
-      fuentes: fuentesValidas.map((f) => ({ nombre: f.nombre.trim(), cuenta: bancoValido(f.cuenta), monto_esperado_centavos: leerMonto(f.monto)!, reglas: f.reglas })),
+      fuentes: fuentesValidas.map((f) => ({ nombre: f.nombre.trim(), cuenta: bancoValido(f.cuenta), monto_esperado_centavos: leerMonto(f.monto)!, frecuencia: f.quincenal ? 'quincenal' : 'mensual', reglas: f.reglas })),
       metas: metas
         .filter((m) => m.nombre.trim())
         .map((m, i) => ({
@@ -158,6 +159,10 @@ export function Bienvenida() {
                 <div key={i} className="card rise" style={{ padding: 20, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: 14, alignItems: 'end', animationDelay: `${i * 70}ms` }}>
                   <Campo etiqueta="Nombre" value={f.nombre} onChange={(e) => cambiarFuente(i, { nombre: e.target.value })} placeholder="Ej. Sueldo" />
                   <CampoDinero etiqueta="Monto al mes" valor={f.monto} onCambio={(t) => cambiarFuente(i, { monto: t })} placeholder="0" />
+                  <div className="etiqueta">
+                    <span className="eyebrow">¿Cada cuándo?</span>
+                    <Segmentado etiqueta="Frecuencia" opciones={['Al mes', 'Quincenal']} valor={f.quincenal ? 1 : 0} onCambio={(k) => cambiarFuente(i, { quincenal: k === 1 })} />
+                  </div>
                   {elegidos.length > 1 && (
                     <div className="etiqueta">
                       <span className="eyebrow">Llega a</span>
@@ -171,7 +176,7 @@ export function Bienvenida() {
                   )}
                 </div>
               ))}
-              <button className="btn" onClick={() => setFuentes((fs) => [...fs, { nombre: '', monto: '', cuenta: elegidos[0]?.clave ?? 'bbva', reglas: {} }])}>
+              <button className="btn" onClick={() => setFuentes((fs) => [...fs, { nombre: '', monto: '', quincenal: false, cuenta: elegidos[0]?.clave ?? 'bbva', reglas: {} }])}>
                 Agregar otro ingreso
               </button>
             </>

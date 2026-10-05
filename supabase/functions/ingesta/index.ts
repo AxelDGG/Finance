@@ -63,7 +63,7 @@ function clienteAdmin(): SupabaseClient {
 async function cargarConfig(db: SupabaseClient, userId: string): Promise<ConfigUsuario> {
   const [cuentas, fuentes, apartados, reglas, categorias, reglasCategoria] = await Promise.all([
     db.from('cuentas').select('id,banco,alias,terminaciones,es_principal').eq('user_id', userId),
-    db.from('fuentes_ingreso').select('id,nombre,cuenta_id,monto_esperado_centavos,tolerancia_pct,palabras_clave,activo').eq('user_id', userId),
+    db.from('fuentes_ingreso').select('id,nombre,cuenta_id,monto_esperado_centavos,frecuencia,tolerancia_pct,palabras_clave,activo').eq('user_id', userId),
     db.from('apartados').select('id,nombre,tipo,descripcion,cuenta_id,destino,meta_centavos,saldo_inicial_centavos,color,orden,archivado').eq('user_id', userId),
     db.from('reglas_reparto').select('id,fuente_id,apartado_id,porcentaje').eq('user_id', userId),
     db.from('categorias').select('id,nombre,color,orden').eq('user_id', userId),
@@ -321,7 +321,7 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   const ruta = new URL(req.url).pathname;
   try {
-    if (req.method === 'GET' && ruta.endsWith('/salud')) return json({ ok: true, version: 2 });
+    if (req.method === 'GET' && ruta.endsWith('/salud')) return json({ ok: true, version: 3 });
     if (req.method !== 'POST') return json({ error: 'Método no permitido' }, 405);
     if (ruta.endsWith('/reprocesar')) return await reprocesar(req);
     return await ingerir(req);
