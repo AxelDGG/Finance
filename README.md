@@ -13,10 +13,10 @@ El plan completo y el estado de cada fase están en [PLAN.md](PLAN.md).
 
 ## Instalar en tu teléfono Android
 
-1. **Instala el APK.** Está en `apps/mobile/android/app/build/outputs/apk/release/app-release.apk`. Cópialo al teléfono y ábrelo; Android te pedirá permitir "instalar apps desconocidas" para el explorador de archivos. Con cable USB y depuración activada también puedes usar:
+1. **Instala el APK.** Está en `apps/mobile/dist/finanzas-1.0.0-arm64-v8a.apk` (se genera con `pnpm apk`). Cópialo al teléfono y ábrelo; Android te pedirá permitir "instalar apps desconocidas" para el explorador de archivos. Con cable USB y depuración activada también puedes usar:
 
    ```bash
-   adb install -r apps/mobile/android/app/build/outputs/apk/release/app-release.apk
+   adb install -r apps/mobile/dist/finanzas-1.0.0-arm64-v8a.apk
    ```
 
 2. **Entra** con tu correo y completa la configuración (cuentas, ingresos, metas y reparto).
