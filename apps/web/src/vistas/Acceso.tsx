@@ -6,7 +6,6 @@ import { entrarDemo } from '../lib/demo';
 import { supabase } from '../lib/supabase';
 
 export function Acceso() {
-  const [modo, setModo] = useState<'entrar' | 'crear'>('entrar');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -20,17 +19,9 @@ export function Acceso() {
     }
     setCargando(true);
     try {
-      if (modo === 'entrar') {
-        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-        if (error) throw error;
-      } else {
-        const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
-        if (error) throw error;
-        if (!data.session) {
-          setMensaje({ texto: 'Listo. Te mandamos un correo para confirmar tu cuenta; ábrelo y luego entra aquí.', error: false });
-          setModo('entrar');
-        }
-      }
+      // Solo entrar: el registro está cerrado (la app es de una sola persona).
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) throw error;
     } catch (e) {
       setMensaje({ texto: traducirError(e instanceof Error ? e.message : String(e)), error: true });
     } finally {
@@ -61,8 +52,8 @@ export function Acceso() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoComplete={modo === 'entrar' ? 'current-password' : 'new-password'}
-            placeholder="Mínimo 6 caracteres"
+            autoComplete="current-password"
+            placeholder="Tu contraseña"
           />
           {mensaje && (
             <div
@@ -83,14 +74,10 @@ export function Acceso() {
             </div>
           )}
           <button type="submit" className="btn pri" disabled={cargando} style={{ minHeight: 52, marginTop: 4 }}>
-            {cargando ? 'Un momento…' : modo === 'entrar' ? 'Entrar' : 'Crear cuenta'}
+            {cargando ? 'Un momento…' : 'Entrar'}
             <IcFlecha className="go" tamano={16} />
           </button>
         </div>
-        <button type="button" className="btn" style={{ background: 'transparent', borderColor: 'transparent' }} onClick={() => setModo(modo === 'entrar' ? 'crear' : 'entrar')}>
-          <span className="tenue">{modo === 'entrar' ? '¿Primera vez?' : '¿Ya tienes cuenta?'}</span>
-          <span style={{ color: 'var(--acento-claro)' }}>{modo === 'entrar' ? 'Crea tu cuenta' : 'Entra'}</span>
-        </button>
         <button type="button" className="btn sm" style={{ alignSelf: 'center' }} onClick={entrarDemo}>
           Ver demostración con datos de ejemplo
         </button>

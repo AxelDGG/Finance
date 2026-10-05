@@ -25,6 +25,9 @@ class LectorNotificacionesModule extends NativeModule<EventosLector> {
     return false;
   }
   configurar(_url: string, _llave: string) {}
+  llave(): string | null {
+    return null;
+  }
   olvidar() {}
   enviarAhora() {}
   estado(): EstadoLector {

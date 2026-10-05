@@ -134,3 +134,12 @@ describe('modo de pruebas del emulador', () => {
     expect(e.comercio).toBe('OXXO');
   });
 });
+
+describe('parsers · textos maliciosos', () => {
+  it('no se cuelga con miles de espacios seguidos (ReDoS)', () => {
+    const inicio = performance.now();
+    const e = parsearNotificacion(noti(BBVA, 'BBVA', `Enviaste $100.00 a cuenta${' '.repeat(4000)}*1234`));
+    expect(performance.now() - inicio).toBeLessThan(200);
+    expect(e?.monto_centavos).toBe(10000);
+  });
+});

@@ -10,6 +10,7 @@ declare class LectorNotificacionesModule extends NativeModule<EventosLector> {
   puedeAvisar(): boolean;
   pedirPermisoAvisos(): boolean;
   configurar(url: string, llave: string): void;
+  llave(): string | null;
   olvidar(): void;
   enviarAhora(): void;
   estado(): EstadoLector;

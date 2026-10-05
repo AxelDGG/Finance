@@ -73,6 +73,16 @@ export interface EventoParseado {
 
 // Las expresiones se aplican al texto normalizado (minúsculas, sin acentos).
 /** Android 15+ reemplaza el texto si cree que trae un código. */
+/**
+ * Junta los espacios repetidos y acota el largo antes de pasar el texto por las
+ * regex: un aviso con miles de espacios seguidos las dejaba colgadas (ReDoS).
+ * Los saltos de línea se conservan porque algunas regex los usan de límite.
+ */
+function compactar(t: string | null | undefined): string | null {
+  if (t == null) return null;
+  return t.replace(/\s{2,}/g, (m) => (m.includes('\n') ? '\n' : ' ')).slice(0, 1500);
+}
+
 const OCULTA = /(sensitive notification content hidden|contenido.{0,30}(sensible|confidencial).{0,20}ocult|contenido oculto)/;
 
 const RECHAZO = /(rechazad|declinad|no (fue|pudo ser|ha sido) (aprobad|autorizad|procesad|realizad)|no se (realizo|pudo|completo)|fallid|fondos insuficientes|saldo insuficiente|no autorizad|cancelad)/;
@@ -97,7 +107,8 @@ function bancoEnTexto(textoNorm: string): Banco | null {
  * Convierte una notificación en un evento bancario.
  * Devuelve null si la app no es una de las que escuchamos.
  */
-export function parsearNotificacion(entrada: NotificacionEntrada): EventoParseado | null {
+export function parsearNotificacion(cruda: NotificacionEntrada): EventoParseado | null {
+  const entrada = { ...cruda, titulo: compactar(cruda.titulo), texto: compactar(cruda.texto), texto_grande: compactar(cruda.texto_grande) };
   const { app, titulo } = resolverApp(entrada.app, entrada.titulo);
   const info = APPS[app];
   if (!info) return null;

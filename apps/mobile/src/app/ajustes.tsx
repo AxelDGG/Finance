@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Boton, Chip, ChipElegible, Presionable, T, Tarjeta } from '../componentes/base';
 import { BotonIcono, Encabezado } from '../componentes/Encabezado';
 import { IconoAtras, IconoDerecha } from '../componentes/iconos';
-import { estadoLector, lectorDisponible } from '../lib/lector';
+import { estadoLector, lectorDisponible, revocarTelefono } from '../lib/lector';
 import { supabase } from '../lib/supabase';
 import { color } from '../lib/tema';
 
@@ -49,6 +49,7 @@ export default function Ajustes() {
         text: 'Cerrar sesión',
         style: 'destructive',
         onPress: async () => {
+          await revocarTelefono(acciones.revocarMiLlave);
           await supabase.auth.signOut();
           router.replace('/login');
         },

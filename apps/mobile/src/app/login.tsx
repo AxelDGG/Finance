@@ -1,7 +1,7 @@
 import { traducirError, useDatos } from '@finanzas/api';
 import { Redirect } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,7 +13,6 @@ import { color } from '../lib/tema';
 export default function Login() {
   const { sesion } = useDatos();
   const insets = useSafeAreaInsets();
-  const [modo, setModo] = useState<'entrar' | 'crear'>('entrar');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -29,17 +28,9 @@ export default function Login() {
     }
     setCargando(true);
     try {
-      if (modo === 'entrar') {
-        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-        if (error) throw error;
-      } else {
-        const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
-        if (error) throw error;
-        if (!data.session) {
-          setMensaje({ texto: 'Listo. Te mandamos un correo para confirmar tu cuenta; ábrelo y luego entra aquí.', error: false });
-          setModo('entrar');
-        }
-      }
+      // Solo entrar: el registro está cerrado (la app es de una sola persona).
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) throw error;
     } catch (e) {
       setMensaje({ texto: traducirError(e instanceof Error ? e.message : String(e)), error: true });
     } finally {
@@ -67,8 +58,8 @@ export default function Login() {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              autoComplete={modo === 'entrar' ? 'current-password' : 'new-password'}
-              placeholder="Mínimo 6 caracteres"
+              autoComplete="current-password"
+              placeholder="Tu contraseña"
               onSubmitEditing={() => void enviar()}
             />
             {mensaje && (
@@ -76,13 +67,7 @@ export default function Login() {
                 <T style={{ color: mensaje.error ? color.peligro : color.acentoTexto, lineHeight: 19 }}>{mensaje.texto}</T>
               </Animated.View>
             )}
-            <Boton titulo={modo === 'entrar' ? 'Entrar' : 'Crear cuenta'} onPress={() => void enviar()} cargando={cargando} style={{ marginTop: 6, minHeight: 54 }} />
-            <Pressable onPress={() => setModo(modo === 'entrar' ? 'crear' : 'entrar')} style={{ alignItems: 'center', paddingVertical: 12 }} accessibilityRole="button">
-              <T v="tenue">
-                {modo === 'entrar' ? '¿Primera vez? ' : '¿Ya tienes cuenta? '}
-                <T style={{ color: color.acentoClaro }}>{modo === 'entrar' ? 'Crea tu cuenta' : 'Entra'}</T>
-              </T>
-            </Pressable>
+            <Boton titulo="Entrar" onPress={() => void enviar()} cargando={cargando} style={{ marginTop: 6, minHeight: 54 }} />
           </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>

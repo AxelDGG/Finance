@@ -31,6 +31,10 @@ const CORS = {
 
 const MAX_POR_LOTE = 100;
 
+/** Lo que manda el teléfono, sin validar todavía. */
+type Cruda = Partial<Record<keyof NotificacionEntrada, unknown>>;
+const recortar = (v: unknown, max: number) => (typeof v === 'string' ? v.slice(0, max) : null);
+
 interface Aviso {
   titulo: string;
   texto: string;
@@ -224,7 +228,9 @@ async function ingerir(req: Request): Promise<Response> {
   if (!dispositivo || dispositivo.revocado) return json({ error: 'Dispositivo no autorizado' }, 401);
 
   const cuerpo = await req.json().catch(() => null);
-  const lote: NotificacionEntrada[] = Array.isArray(cuerpo?.notificaciones) ? cuerpo.notificaciones.slice(0, MAX_POR_LOTE) : [];
+  const lote: Cruda[] = (Array.isArray(cuerpo?.notificaciones) ? cuerpo.notificaciones.slice(0, MAX_POR_LOTE) : []).filter(
+    (n: unknown): n is Cruda => typeof n === 'object' && n !== null,
+  );
   await db.from('dispositivos').update({ ultimo_uso: new Date().toISOString() }).eq('id', dispositivo.id);
   if (lote.length === 0) return json({ procesadas: 0, resultados: [], avisos: [] });
 
@@ -236,17 +242,17 @@ async function ingerir(req: Request): Promise<Response> {
   lote.sort((a, b) => Number(a.publicada_en) - Number(b.publicada_en));
   for (const n of lote) {
     try {
-      if (typeof n?.app !== 'string' || !Number.isFinite(Number(n.publicada_en))) {
+      if (typeof n.app !== 'string' || !Number.isFinite(Number(n.publicada_en))) {
         resultados.push({ estado: 'invalida' });
         continue;
       }
       const entrada: NotificacionEntrada = {
         app: n.app.slice(0, 200),
-        titulo: n.titulo?.slice(0, 500) ?? null,
-        texto: n.texto?.slice(0, 2000) ?? null,
-        texto_grande: n.texto_grande?.slice(0, 4000) ?? null,
+        titulo: recortar(n.titulo, 500),
+        texto: recortar(n.texto, 2000),
+        texto_grande: recortar(n.texto_grande, 4000),
         publicada_en: Number(n.publicada_en),
-        clave: n.clave?.slice(0, 300) ?? null,
+        clave: recortar(n.clave, 300),
       };
       const huella = await sha256(
         [entrada.app, entrada.titulo, entrada.texto, entrada.texto_grande, Math.floor(entrada.publicada_en / 60000)].join('|'),
@@ -321,12 +327,13 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   const ruta = new URL(req.url).pathname;
   try {
-    if (req.method === 'GET' && ruta.endsWith('/salud')) return json({ ok: true, version: 3 });
+    if (req.method === 'GET' && ruta.endsWith('/salud')) return json({ ok: true, version: 4 });
     if (req.method !== 'POST') return json({ error: 'Método no permitido' }, 405);
     if (ruta.endsWith('/reprocesar')) return await reprocesar(req);
     return await ingerir(req);
   } catch (e) {
     console.error(e);
-    return json({ error: e instanceof Error ? e.message : String(e) }, 500);
+    // El detalle queda en el registro de la función; al cliente no se le filtra.
+    return json({ error: 'Error interno, inténtalo más tarde' }, 500);
   }
 });

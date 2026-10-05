@@ -20,6 +20,13 @@ export async function vincularTelefono(registrar: (nombre: string) => Promise<st
   Lector.configurar(URL_SUPABASE, llave);
 }
 
+/** Revoca en el servidor la llave de este teléfono; si no hay red, igual se olvida localmente. */
+export async function revocarTelefono(revocar: (llave: string) => Promise<void>): Promise<void> {
+  if (!lectorDisponible) return;
+  const llave = Lector.llave();
+  if (llave) await revocar(llave).catch(() => undefined);
+}
+
 export function olvidarTelefono() {
   if (lectorDisponible) Lector.olvidar();
 }

@@ -205,7 +205,12 @@ export async function registrarDispositivo(db: SupabaseClient, nombre: string): 
 }
 
 export async function revocarDispositivo(db: SupabaseClient, id: string) {
-  revisar(await db.from('dispositivos').update({ revocado: true }).eq('id', id));
+  revisar(await db.rpc('revocar_dispositivo', { p_id: id }));
+}
+
+/** Revoca en el servidor la llave de este teléfono (al cerrar sesión). */
+export async function revocarMiLlave(db: SupabaseClient, llave: string) {
+  revisar(await db.rpc('revocar_mi_llave', { p_llave: llave }));
 }
 
 /** Vuelve a interpretar las notificaciones "por revisar" (p. ej. tras mejorar los parsers). */

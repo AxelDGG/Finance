@@ -89,6 +89,11 @@ class LectorNotificacionesModule : Module() {
       TrabajoEnvio.programar(context)
     }
 
+    /** La llave guardada, para revocarla en el servidor antes de cerrar sesión. */
+    Function("llave") {
+      Ajustes(context).llave
+    }
+
     Function("olvidar") {
       Ajustes(context).borrar()
       Almacen.de(context).borrarTodo()
